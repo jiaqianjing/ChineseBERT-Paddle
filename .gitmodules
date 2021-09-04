@@ -1,0 +1,3 @@
+[submodule "ChineseBert"]
+	path = ChineseBert
+	url = https://github.com/ShannonAI/ChineseBert.git
