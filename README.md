@@ -1,0 +1,2 @@
+# ChineseBERT-Paddle
+论文名称： ChineseBERT: Chinese Pretraining Enhanced by Glyph and Pinyin Information 数据集： CMRC XNLI ChnSentiCorp LCQMC OntoNotes 4.0 验收标准： 1. 复现ChineseBert模型（参考论文和实现链接） 2. 完成模型权重从pytorch到paddle的转换代码，转换2个预训练权重（“ChineseBERT-base”，“ChineseBERT-large”） 3. "ChineseBERT-large"模型指标：CMRC dev/test=70.70/78.05（见论文Table 2）， XNLI dev/test=82.7/81.6（见论文Table 4），ChnSentiCorp dev/test=95.8/95.9 4. 提交PR至PaddleNLP
