@@ -21,7 +21,10 @@ import paddle
 import paddle.nn as nn
 from .. import PretrainedModel, register_base_model
 
-__all__ = ['GlyceBertPretrainedModel', 'GlyceBertModel']
+__all__ = [
+    'GlyceBertPretrainedModel', 'GlyceBertModel',
+    'GlyceBertForSequenceClassification'
+]
 
 
 class PinyinEmbedding(nn.Layer):
@@ -306,6 +309,70 @@ class GlyceBertModel(GlyceBertPretrainedModel):
             return encoder_outputs, pooled_output
         else:
             return sequence_output, pooled_output
+
+
+class GlyceBertForSequenceClassification(GlyceBertPretrainedModel):
+    """
+    GlyceBert Model with a sequence classification/regression head on top (a linear layer on top of the pooled output) e.g.
+    for GLUE tasks.
+
+    Args:
+        bert (:class:`GlyceBertModel`):
+            An instance of GlyceBertModel.
+        num_classes (int, optional):
+            The number of classes. Defaults to `2`.
+        dropout (float, optional):
+            The dropout probability for output of GlyceBertModel.
+            If None, use the same value as `hidden_dropout_prob` of `GlyceBertModel`
+            instance `bert`. Defaults to None.
+    """
+    def __init__(self, bert, num_classes=2, dropout=None):
+        super(GlyceBertForSequenceClassification, self).__init__()
+        self.num_classes = num_classes
+        self.bert = bert  # allow bert to be config
+        self.dropout = nn.Dropout(dropout if dropout is not None else self.bert.
+                                  config["hidden_dropout_prob"])
+        self.classifier = nn.Linear(self.bert.config["hidden_size"],
+                                    num_classes)
+        self.apply(self.init_weights)
+
+    def forward(self,
+                input_ids,
+                pinyin_ids,
+                token_type_ids=None,
+                position_ids=None,
+                attention_mask=None):
+        r"""
+        The GlyceBertForSequenceClassification forward method, overrides the __call__() special method.
+
+        Args:
+            input_ids (Tensor):
+                See :class:`BertModel`.
+            token_type_ids (Tensor, optional):
+                See :class:`BertModel`.
+            position_ids(Tensor, optional):
+                See :class:`BertModel`.
+            attention_mask (list, optional):
+                See :class:`BertModel`.
+
+        Returns:
+            Tensor: Returns tensor `logits`, a tensor of the input text classification logits.
+            Shape as `[batch_size, num_classes]` and dtype as float32.
+
+        Example:
+            .. code-block::
+
+        """
+
+        _, pooled_output = self.bert(input_ids,
+                                     pinyin_ids,
+                                     token_type_ids=token_type_ids,
+                                     position_ids=position_ids,
+                                     attention_mask=attention_mask)
+
+        pooled_output = self.dropout(pooled_output)
+        logits = self.classifier(pooled_output)
+        return logits
 
 
 def test_pinyin_embeddings():
