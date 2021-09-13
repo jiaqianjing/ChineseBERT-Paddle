@@ -219,7 +219,9 @@ class GlyceBertPretrainedModel(PretrainedModel):
             if isinstance(layer.weight, paddle.Tensor):
                 layer.weight.set_value(
                     paddle.tensor.normal(mean=0.0,
-                                         std=self.initializer_range,
+                                         std=self.initializer_range if hasattr(
+                                             self, "initializer_range") else
+                                         self.bert.config["initializer_range"],
                                          shape=layer.weight.shape))
         elif isinstance(layer, nn.LayerNorm):
             layer._epsilon = 1e-12
