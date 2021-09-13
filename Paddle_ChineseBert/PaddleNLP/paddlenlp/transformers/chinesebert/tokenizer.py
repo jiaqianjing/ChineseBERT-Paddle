@@ -76,7 +76,7 @@ class ChineseBertTokenizer(PretrainedTokenizer):
 
         # convert list to np.array
         input_ids = np.array(input_ids)
-        pinyin_ids = np.array(pinyin_ids).reshape([-1])
+        pinyin_ids = np.array(pinyin_ids).reshape([-1, 8])
         return {"input_ids": input_ids, "pinyin_ids": pinyin_ids}
 
     def convert_sentence_to_pinyin_ids(self, sentence: str) -> List[List[int]]:
