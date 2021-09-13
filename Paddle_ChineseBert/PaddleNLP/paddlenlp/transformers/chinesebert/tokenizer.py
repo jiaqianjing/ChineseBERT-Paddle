@@ -67,8 +67,8 @@ class ChineseBertTokenizer(PretrainedTokenizer):
         input_ids = tokenizer_output['input_ids']
         pinyin_ids = self.convert_sentence_to_pinyin_ids(sentence)
         # assert，token nums should be same as pinyin token nums
-        # assert len(input_ids) <= self.max_seq_len
-        # assert len(input_ids) == len(pinyin_ids)
+        assert len(input_ids) <= self.max_seq_len
+        assert len(input_ids) == len(pinyin_ids)
 
         # convert list to tensor
         # input_ids = paddle.to_tensor(input_ids)
