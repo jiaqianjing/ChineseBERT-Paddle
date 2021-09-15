@@ -118,13 +118,54 @@ class ChineseBertTokenizer(PretrainedTokenizer):
         for idx, (token, offset) in enumerate(
                 zip(bert_tokens_tokens, bert_tokens_offsets)):
             if offset[1] - offset[0] != 1:
+                # 非单个字的token，以及 [CLS] [SEP] 特殊 token
                 pinyin_ids.append([0] * 8)
                 continue
             if offset[0] in pinyin_locs:
+                # 单个字为token且有拼音tensor
                 pinyin_ids.append(pinyin_locs[offset[0]])
             else:
+                # 单个字为token但无拼音tensor
                 pinyin_ids.append([0] * 8)
 
+        return pinyin_ids
+
+    def convert_tokens_to_pinyin_ids(self,
+                                     tokens: List[str]) -> List[List[int]]:
+        """
+        Example :
+            tokens:  ['[CLS]', '你', '多', '大', '了', '？', '[SEP]', '我', '10', '岁', '了', '。', '[SEP]']
+        """
+        pinyin_ids = []
+        for token in tokens:
+            if token == '[CLS]' or token == '[SEP]':
+                # [CLS]、[SEP] 的 token
+                pinyin_ids.append([0] * 8)
+                continue
+            offset = self.get_offset_mapping(token)[0]
+            if offset[1] - offset[0] != 1:
+                # 非单个字组成的 token
+                pinyin_ids.append([0] * 8)
+                continue
+            pinyin_string = pinyin(token,
+                                   style=Style.TONE3,
+                                   heteronym=True,
+                                   errors=lambda x: [['not chinese']
+                                                     for _ in x])[0][0]
+            if pinyin_string == "not chinese":
+                # 不是中文
+                pinyin_ids.append([0] * 8)
+            else:
+                if pinyin_string in self.pinyin2tensor:
+                    pinyin_ids.append(self.pinyin2tensor[pinyin_string])
+                else:
+                    ids = [0] * 8
+                    for i, p in enumerate(pinyin_string):
+                        if p not in self.pinyin_dict["char2idx"]:
+                            ids = [0] * 8
+                            break
+                        ids[i] = self.pinyin_dict["char2idx"][p]
+                    pinyin_ids.append(ids)
         return pinyin_ids
 
     @property

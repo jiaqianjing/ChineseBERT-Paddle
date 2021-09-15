@@ -23,7 +23,7 @@ from .. import PretrainedModel, register_base_model
 
 __all__ = [
     'GlyceBertPretrainedModel', 'GlyceBertModel',
-    'GlyceBertForSequenceClassification'
+    'GlyceBertForSequenceClassification', 'GlyceBertForQuestionAnswering'
 ]
 
 
@@ -375,3 +375,36 @@ class GlyceBertForSequenceClassification(GlyceBertPretrainedModel):
         pooled_output = self.dropout(pooled_output)
         logits = self.classifier(pooled_output)
         return logits
+
+
+class GlyceBertForQuestionAnswering(GlyceBertPretrainedModel):
+    def __init__(self, bert, dropout=None):
+        super(GlyceBertForQuestionAnswering, self).__init__()
+        self.bert = bert  # allow bert to be config
+        self.dropout = nn.Dropout(dropout if dropout is not None else self.bert.
+                                  config["hidden_dropout_prob"])
+        self.classifier = nn.Linear(self.bert.config["hidden_size"], 2)
+        self.apply(self.init_weights)
+
+    def forward(self,
+                input_ids=None,
+                pinyin_ids=None,
+                token_type_ids=None,
+                attention_mask=None,
+                start_positions=None,
+                end_positions=None):
+        r"""
+        The GlyceBertForQuestionAnswering forward method, overrides the __call__() special method.
+        """
+
+        sequence_output, _ = self.bert(input_ids,
+                                       pinyin_ids,
+                                       token_type_ids=token_type_ids,
+                                       position_ids=None,
+                                       attention_mask=None)
+
+        logits = self.classifier(sequence_output)
+        logits = paddle.transpose(logits, perm=[2, 0, 1])
+        start_logits, end_logits = paddle.unstack(x=logits, axis=0)
+
+        return start_logits, end_logits
