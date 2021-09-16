@@ -79,16 +79,18 @@ class ChineseBertTokenizer(PretrainedTokenizer):
         pinyin_ids = np.array(pinyin_ids).reshape([-1, 8])
         return {"input_ids": input_ids, "pinyin_ids": pinyin_ids}
 
-    def convert_sentence_to_pinyin_ids(self, sentence: str) -> List[List[int]]:
+    def convert_sentence_to_pinyin_ids(self, sentence: str, with_specail_token=True) -> List[List[int]]:
         # get offsets
         bert_tokens_offsets = self.get_offset_mapping(sentence)
-        bert_tokens_offsets.insert(0, (0, 0))
-        bert_tokens_offsets.append((0, 0))
+        if with_specail_token:
+            bert_tokens_offsets.insert(0, (0, 0))
+            bert_tokens_offsets.append((0, 0))
 
         # get tokens
         bert_tokens_tokens = self.tokenize(sentence)
-        bert_tokens_tokens.insert(0, '[CLS]')
-        bert_tokens_tokens.append('[SEP]')
+        if with_specail_token:
+            bert_tokens_tokens.insert(0, '[CLS]')
+            bert_tokens_tokens.append('[SEP]')
 
         # get pinyin of a sentence
         pinyin_list = pinyin(sentence,
