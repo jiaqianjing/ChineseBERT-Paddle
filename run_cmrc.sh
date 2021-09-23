@@ -34,8 +34,8 @@ do
         --device gpu \
         --n_best_size $i \
         --max_answer_length 30
-    
-    mkdir -p $output_dir/$i
-    mv $output/cmrc/* $output_dir/$i/cmrc/
+
+    mkdir -p $output_dir/cmrc/$i
+    mv $output/cmrc/* $output_dir/cmrc/$i
     sleep 3s
 done
