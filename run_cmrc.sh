@@ -15,7 +15,7 @@ for i in $(seq 1 5 20)
 do
     echo "================== 第 $i 次 =========================="
     unset CUDA_VISIBLE_DEVICES
-    python -m paddle.distributed.launch --gpus "0,1,2,3" cmrc.py \
+    python -m paddle.distributed.launch --gpus "0" cmrc.py \
         --seed 1000 \
         --task_name cmrc2018 \
         --model_type ernie_gram \
@@ -33,9 +33,9 @@ do
         --do_predict \
         --device gpu \
         --n_best_size $i \
-        --max_answer_length 30 \
+        --max_answer_length 30
     
     mkdir -p $output_dir/$i
-    mv $output/cmrc $output_dir/$i/
+    mv $output/cmrc/* $output_dir/$i/cmrc/
     sleep 3s
 done

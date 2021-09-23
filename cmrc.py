@@ -199,19 +199,18 @@ def read(data_path):
                     }
 
 
-data_prefix = "/root/paddlejob/workspace/code"
 # data_path为read()方法的参数
 train_ds = load_dataset(
     read,
-    data_path=f'{data_prefix}/ChineseBERT-Paddle/data/CMRC/raw_data/train.json',
+    data_path=f'./data/CMRC/raw_data/train.json',
     lazy=False)
 dev_ds = load_dataset(
     read,
-    data_path=f'{data_prefix}/ChineseBERT-Paddle/data/CMRC/raw_data/dev.json',
+    data_path=f'./data/CMRC/raw_data/dev.json',
     lazy=False)
 test_ds = load_dataset(
     read,
-    data_path=f'{data_prefix}/ChineseBERT-Paddle/data/CMRC/raw_data/test.json',
+    data_path=f'./data/CMRC/raw_data/test.json',
     lazy=False)
 print(
     f"train_ds len: {len(train_ds)}, dev_ds len: {len(dev_ds)}, test_ds len: {len(test_ds)}"

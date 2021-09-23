@@ -7,6 +7,7 @@ pretrain_models/
 output
 .vscode/
 checkpoint/
+log/
 
 # C extensions
 *.so
